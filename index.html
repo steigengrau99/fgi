@@ -1,29 +1,120 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Crypto Fear & Greed Index</title>
-</head>
-<body>
-  <h1>📊 Crypto Fear & Greed Index</h1>
-  <p id="status">Loading…</p>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Crypto Market Dashboard</title>
 
-  <script>
-    fetch("fear_greed.json")
-      .then(res => {
-        if (!res.ok) throw new Error("JSON not found");
-        return res.json();
-      })
-      .then(data => {
-        const latest = data[data.length - 1];
-        document.getElementById("status").innerText =
-          `Value: ${latest.value} (${latest.value_classification})`;
-      })
-      .catch(err => {
-        document.getElementById("status").innerText =
-          "Error loading data";
-        console.error(err);
-      });
-  </script>
+<style>
+:root {
+  --bg: #0b0e11;
+  --panel: #161a1e;
+  --text: #eaecef;
+  --muted: #848e9c;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.timestamp {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.card {
+  background: var(--panel);
+  border-radius: 14px;
+  padding: 30px;
+  margin-top: 25px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.4);
+}
+
+.value {
+  font-size: 4rem;
+  font-weight: 700;
+}
+
+.label {
+  font-size: 1.3rem;
+  margin-top: 8px;
+}
+
+.extreme-fear { color: #ff4d4f; }
+.fear { color: #ff7a45; }
+.neutral { color: #fadb14; }
+.greed { color: #73d13d; }
+.extreme-greed { color: #52c41a; }
+
+.footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 40px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="title">📊 Crypto Market Sentiment</div>
+    <div class="timestamp" id="updated">Loading…</div>
+  </div>
+
+  <div class="card">
+    <div class="value" id="value">—</div>
+    <div class="label" id="label">Loading…</div>
+  </div>
+
+  <div class="footer">
+    Data source: Alternative.me • Auto-updated daily
+  </div>
+
+</div>
+
+<script>
+fetch("fear_greed.json")
+  .then(res => res.json())
+  .then(data => {
+    const latest = data[data.length - 1];
+
+    const value = latest.value;
+    const label = latest.value_classification;
+    const ts = new Date(latest.timestamp * 1000).toLocaleDateString();
+
+    const labelClass = label.toLowerCase().replace(" ", "-");
+
+    document.getElementById("value").innerText = value;
+    document.getElementById("label").innerText = label;
+    document.getElementById("label").classList.add(labelClass);
+    document.getElementById("updated").innerText = `Updated: ${ts}`;
+  })
+  .catch(() => {
+    document.getElementById("label").innerText = "Data unavailable";
+  });
+</script>
+
 </body>
 </html>
