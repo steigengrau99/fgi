@@ -25,15 +25,34 @@
 <script>
 fetch("fear_greed.json")
   .then(res => res.json())
-  .then(data => {
-    document.getElementById("value").textContent = data.value;
-    document.getElementById("label").textContent = data.value_classification;
+  .then(history => {
+    const latest = history[history.length - 1];
+
+    document.getElementById("value").textContent = latest.value;
+    document.getElementById("label").textContent = latest.value_classification;
     document.getElementById("updated").textContent =
-      "Updated: " + new Date(data.timestamp * 1000).toLocaleString();
-  })
-  .catch(err => {
-    document.getElementById("value").textContent = "Error loading data";
-    console.error(err);
+      "Updated: " + new Date(latest.timestamp * 1000).toLocaleString();
+
+    const ctx = document.getElementById("historyChart");
+
+    new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: history.map(d =>
+          new Date(d.timestamp * 1000).toLocaleDateString()
+        ),
+        datasets: [{
+          label: "Fear & Greed Index",
+          data: history.map(d => d.value),
+          tension: 0.3
+        }]
+      },
+      options: {
+        scales: {
+          y: { min: 0, max: 100 }
+        }
+      }
+    });
   });
 </script>
 
