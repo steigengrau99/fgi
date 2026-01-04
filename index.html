@@ -1,35 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Market Sentiment Dashboard</title>
+  <meta charset="UTF-8">
+  <title>Fear & Greed Dashboard</title>
+  <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-  <h1>Fear & Greed Index</h1>
 
-  <h2 id="score">Loading...</h2>
-  <p id="rating"></p>
-  <p id="history"></p>
-  <small id="updated"></small>
+<div class="container">
+  <h1>📊 Crypto Fear & Greed Index</h1>
 
-  <script>
-    fetch("fear_greed.json")
-      .then(res => res.json())
-      .then(d => {
-        document.getElementById("score").innerText =
-          `Score: ${d.score}`;
+  <div class="card">
+    <div id="value" class="value">Loading…</div>
+    <div id="label" class="label"></div>
+    <div id="updated" class="updated"></div>
+  </div>
 
-        document.getElementById("rating").innerText =
-          `Current sentiment: ${d.rating}`;
+  <div class="card">
+    <canvas id="historyChart"></canvas>
+  </div>
+</div>
 
-        document.getElementById("history").innerText =
-          `Previous close: ${d.previous_close}
-           | 1 week ago: ${d.one_week_ago}
-           | 1 month ago: ${d.one_month_ago}`;
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+fetch("fear_greed.json")
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("value").textContent = data.value;
+    document.getElementById("label").textContent = data.value_classification;
+    document.getElementById("updated").textContent =
+      "Updated: " + new Date(data.timestamp * 1000).toLocaleString();
+  })
+  .catch(err => {
+    document.getElementById("value").textContent = "Error loading data";
+    console.error(err);
+  });
+</script>
 
-        document.getElementById("updated").innerText =
-          `Last updated: ${d.timestamp}`;
-      });
-  </script>
 </body>
 </html>
